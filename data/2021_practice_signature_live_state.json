@@ -1,9 +1,0 @@
-{
-  "account": "2021实践团",
-  "bid": 4,
-  "tid": 19989,
-  "pid": 74,
-  "api_url": "https://chexie.net/api/bbs/content/floor/?bid=4&tid=19989&pid=74",
-  "loader": "<script>$.get(\"/api/bbs/content/floor/?bid=4&tid=19989&pid=74\",function(data){sign=data+\"<br><br>\";$(\".sig\").each(function(){if($(this).html().search(\"bid=4&tid=19989&pid=74\")!=-1){$(this).html(sign);}});});</script>加载签名档中...<br><br><br>",
-  "created_at": 1780624180
-}

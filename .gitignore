@@ -1,5 +1,5 @@
 login_info/
 __pycache__/
 *.pyc
-data/test.db
-data/inspect_chexie/
+data/
+notes/
