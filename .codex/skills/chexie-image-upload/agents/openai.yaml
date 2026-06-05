@@ -1,0 +1,6 @@
+interface:
+  display_name: "Chexie Image Upload"
+  short_description: "Handle CAPUBBS image upload and signature image URLs"
+  default_prompt: "Use $chexie-image-upload to upload or reuse an image for a Chexie post or signature."
+policy:
+  allow_implicit_invocation: true

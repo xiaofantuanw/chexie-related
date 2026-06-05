@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chexie Signature"
+  short_description: "Generate chexie.net BBS signature HTML drafts and previews."
+  default_prompt: "Create a chexie.net BBS signature draft and local preview."
