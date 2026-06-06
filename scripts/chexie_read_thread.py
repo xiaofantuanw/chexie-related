@@ -22,7 +22,7 @@ from chexie_agent.serialization import to_plain_data
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Read one Chexie thread page as structured JSON.")
-    parser.add_argument("thread", help="Legacy thread URL, new thread id such as 28-150, or any URL containing bid/tid.")
+    parser.add_argument("thread", help="Thread URL or internal thread id.")
     parser.add_argument("--page", "-p", type=int, default=1, help="Thread page to read. Default: 1.")
     parser.add_argument("--indent", type=int, default=2, help="JSON indentation. Default: 2.")
     args = parser.parse_args()

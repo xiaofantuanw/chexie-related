@@ -92,8 +92,8 @@ python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
 
 ```bash
 python3 scripts/chexie_research.py read "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
-python3 scripts/chexie_research.py read "2-9015" --all-pages --format markdown
+python3 scripts/chexie_research.py read "PASTE_THREAD_URL_HERE" --all-pages --format markdown
 python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
 ```
 
-`chexie_research.py` 默认输出 Markdown，包含稳定的 thread/floor 引用，适合让后续 agent 做总结、对比和证据链整理；也可以用 `--format json` 输出结构化数据。
+`chexie_research.py` 默认输出面向用户的 Markdown，只使用标题、版面、楼层、作者和时间来称呼帖子内容，不把 `bid/tid/pid` 暴露为日常称呼；也可以用 `--format json` 输出包含内部引用的结构化数据。

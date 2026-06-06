@@ -22,7 +22,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     read_parser = subparsers.add_parser("read", help="Read one legacy thread.")
-    read_parser.add_argument("thread", help="Legacy URL, new thread id such as 28-150, or any URL containing bid/tid.")
+    read_parser.add_argument("thread", help="Thread URL or internal thread id.")
     read_parser.add_argument("--all-pages", action="store_true", help="Read and merge all available pages.")
     read_parser.add_argument("--max-pages", type=int, default=None, help="Limit page count when --all-pages is used.")
     read_parser.add_argument("--format", choices=("json", "markdown"), default="markdown")

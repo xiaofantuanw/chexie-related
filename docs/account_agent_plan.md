@@ -27,14 +27,14 @@ Initial read-only thread parsing is implemented through:
 
 ```bash
 python3 scripts/chexie_research.py read "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
-python3 scripts/chexie_research.py read "2-9015" --all-pages --format markdown
+python3 scripts/chexie_research.py read "PASTE_THREAD_URL_HERE" --all-pages --format markdown
 python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
 python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
 python3 scripts/chexie_search_threads.py "新版论坛"
 python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
 ```
 
-`chexie_research.py` is the preferred first-stage read-only agent entry point. It wraps the adapter in `ForumResearchAgent`, supports all-page thread reads, and renders Markdown with stable thread/floor references for later summarization, signup parsing, reminders, and account actions. The lower-level scripts remain useful for JSON-only inspection.
+`chexie_research.py` is the preferred first-stage read-only agent entry point. It wraps the adapter in `ForumResearchAgent`, supports all-page thread reads, and renders user-facing Markdown that refers to content by title, board, author, time, and floor number rather than raw `bid/tid/pid` ids. The lower-level scripts remain useful for JSON-only inspection.
 
 These should remain public read-only workflows unless an explicitly authorized authenticated read mode is added later.
 
@@ -107,3 +107,4 @@ Write actions require an exact target and explicit approval. Examples:
 - Keep raw crawls and private summaries under ignored local directories.
 - Redact private account names and sensitive personal data before publishing public notes.
 - Prefer source links and structured references over copying large forum content into committed files.
+- Treat `bid`, `tid`, `pid`, and `BID-TID` values as internal references. User-facing summaries should normally name帖子标题、版面、楼层、作者和时间；raw ids belong in JSON, commands, logs, and implementation details.

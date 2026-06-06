@@ -33,6 +33,7 @@ Do not commit local-only areas unless the user explicitly asks and confirms the 
 - Do not perform live Chexie uploads, posts, replies, profile edits, or signature edits unless the user explicitly authorizes that exact action.
 - Keep generated public docs free of private account data and scraped personal details.
 - Treat test.chexie.net actions as live forum actions too. Even when the test forum uses a database snapshot, writes can still affect an account and should require explicit authorization.
+- Keep `bid`, `tid`, `pid`, and `BID-TID` thread ids as internal implementation details. In user-facing replies and default Markdown reports, refer to posts by title, board, author, date, and floor number instead of labels like `2-9015` or `28-150#1F`. Use raw ids only in commands, JSON, code, logs, or when the user explicitly asks for technical references.
 
 ## Default Agent Workflow
 
@@ -94,14 +95,14 @@ Current read-only thread parser entry point:
 
 ```bash
 python3 scripts/chexie_research.py read "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
-python3 scripts/chexie_research.py read "2-9015" --all-pages --format markdown
+python3 scripts/chexie_research.py read "PASTE_THREAD_URL_HERE" --all-pages --format markdown
 python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
 python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
 python3 scripts/chexie_search_threads.py "新版论坛"
 python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
 ```
 
-Prefer `chexie_research.py` for new read-only workflows because it can merge all pages and render stable Markdown citations. `chexie_read_thread.py` and `chexie_search_threads.py` remain lower-level JSON helpers. These commands perform public read-only HTTP requests. They must not use login credentials or write forum state.
+Prefer `chexie_research.py` for new read-only workflows because it can merge all pages and render user-facing Markdown without exposing internal thread ids. `chexie_read_thread.py` and `chexie_search_threads.py` remain lower-level JSON helpers. These commands perform public read-only HTTP requests. They must not use login credentials or write forum state.
 
 ## Account-Agent Roadmap
 

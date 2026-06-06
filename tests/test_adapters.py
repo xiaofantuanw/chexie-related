@@ -166,5 +166,24 @@ def test_research_agent_renders_thread_markdown():
     rendered = ForumResearchAgent(adapter).render_thread_markdown(thread)
 
     assert "# 测试帖子" in rendered
-    assert "## 2-1#1F alice 2026-05-21 00:00:00" in rendered
+    assert "## 第 1 楼 alice 2026-05-21 00:00:00" in rendered
     assert "正文" in rendered
+    assert "2-1" not in rendered
+
+
+def test_research_agent_renders_search_markdown_without_internal_ids():
+    adapter = LegacyCapubbsAdapter()
+    results = adapter.parse_search_html(
+        """
+        <html><body>
+          <a href="/bbs/content/?bid=2&tid=9015&p=1">追责讨论</a>
+        </body></html>
+        """,
+        source_url="https://chexie.net/bbs/search/",
+    )
+    rendered = ForumResearchAgent(adapter).render_search_markdown(results)
+
+    assert "追责讨论" in rendered
+    assert "2-9015" not in rendered
+    assert "bid=" not in rendered
+    assert "tid=" not in rendered

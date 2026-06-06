@@ -51,25 +51,23 @@ class ForumResearchAgent:
 
     def render_thread_markdown(self, thread: ForumThread, *, include_nested: bool = True) -> str:
         lines = [
-            f"# {thread.title or thread.ref.short_label}",
+            f"# {thread.title or '未命名帖子'}",
             "",
-            f"- Thread: {thread.ref.short_label}",
-            f"- URL: {self.adapter.legacy_thread_url(thread.ref, thread.page)}",
         ]
         if thread.board:
-            lines.append(f"- Board: {thread.board.name or thread.board.bid}")
+            lines.append(f"- 版面: {thread.board.name or '未知版面'}")
         if thread.total_pages:
-            lines.append(f"- Pages: {thread.total_pages}")
+            lines.append(f"- 总页数: {thread.total_pages}")
         if thread.login_required:
-            lines.append("- Login required: true")
+            lines.append("- 需要登录: 是")
         lines.append("")
 
         for post in thread.posts:
-            heading = f"## {post.ref.label} {post.author} {post.posted_at}".strip()
+            heading = f"## 第 {post.floor} 楼 {post.author} {post.posted_at}".strip()
             lines.extend([heading, ""])
             lines.append(post.content_text.strip() or "(empty)")
             if include_nested and post.nested_replies:
-                lines.extend(["", "Nested replies:"])
+                lines.extend(["", "楼中楼:"])
                 for reply in post.nested_replies:
                     suffix = f" {reply.posted_at}" if reply.posted_at else ""
                     lines.append(f"- {reply.author}{suffix}: {reply.content_text}")
@@ -84,9 +82,7 @@ class ForumResearchAgent:
             return "\n".join(lines) + "\n"
         for index, result in enumerate(results, start=1):
             board = f" [{result.board.name}]" if result.board and result.board.name else ""
-            lines.append(f"{index}. {result.title or result.ref.short_label}{board}")
-            lines.append(f"   - Thread: {result.ref.short_label}")
-            lines.append(f"   - URL: {result.url}")
+            lines.append(f"{index}. {result.title or '未命名帖子'}{board}")
             if result.excerpt:
-                lines.append(f"   - Excerpt: {result.excerpt}")
+                lines.append(f"   - 摘要: {result.excerpt}")
         return "\n".join(lines) + "\n"
