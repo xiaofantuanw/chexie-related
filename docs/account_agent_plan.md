@@ -23,6 +23,16 @@ Stage 0: foundation
 - Safety layer that distinguishes read, draft, and live write actions.
 - Local-only config and state under ignored directories.
 
+Initial read-only thread parsing is implemented through:
+
+```bash
+python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
+python3 scripts/chexie_search_threads.py "新版论坛"
+python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
+```
+
+These should remain public read-only workflows. They are the first standardized read paths for later summarization, signup parsing, reminders, and account actions.
+
 Stage 1: account control
 
 - Login through local scripts or terminal input, never chat.

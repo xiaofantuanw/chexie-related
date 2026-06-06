@@ -55,3 +55,33 @@ class ForumPost:
     posted_at: str
     content_text: str
     content_html: str = ""
+    pid: int | None = None
+    nested_replies: tuple["NestedReply", ...] = ()
+
+
+@dataclass(frozen=True)
+class NestedReply:
+    author: str
+    content_text: str
+    posted_at: str = ""
+
+
+@dataclass(frozen=True)
+class ForumThread:
+    ref: ThreadRef
+    title: str
+    board: BoardRef | None = None
+    page: int = 1
+    total_pages: int | None = None
+    posts: tuple[ForumPost, ...] = ()
+    source_url: str = ""
+    login_required: bool = False
+
+
+@dataclass(frozen=True)
+class ForumSearchResult:
+    ref: ThreadRef
+    title: str
+    url: str
+    excerpt: str = ""
+    board: BoardRef | None = None

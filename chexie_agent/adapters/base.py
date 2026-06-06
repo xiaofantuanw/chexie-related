@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from chexie_agent.domain import ForumPost, ThreadRef
+from chexie_agent.domain import ForumPost, ForumSearchResult, ForumThread, ThreadRef
 
 
 class ForumAdapter(Protocol):
@@ -24,3 +24,9 @@ class ForumAdapter(Protocol):
 
     def fetch_thread_posts(self, thread: ThreadRef, page: int = 1) -> list[ForumPost]:
         """Read posts from one thread page."""
+
+    def fetch_thread(self, thread: ThreadRef, page: int = 1) -> ForumThread:
+        """Read one thread page and return structured metadata plus posts."""
+
+    def search_threads(self, keyword: str, *, author: str = "") -> list[ForumSearchResult]:
+        """Search public legacy thread references by keyword."""

@@ -6,6 +6,8 @@
 
 - `.codex/skills/chexie-signature/`: 车协签名档制作、预览、检查和发布辅助 skill。
 - `.codex/skills/chexie-image-upload/`: 车协论坛图片上传、图片引用和签名档图片处理辅助 skill。
+- `chexie_agent/`: 账户 agent 的 Python package 骨架，包含 forum-independent 数据模型、安全 gate、legacy/new forum adapters 和 workflow 入口。
+- `docs/`: 新版论坛迁移、账户 agent 规划等可公开设计文档。
 - `scripts/`: 用于检查论坛页面、导出签名档、更新或恢复签名档的辅助脚本。
 - `data/`: 本地草稿、预览、抓取快照等运行产物。这个目录不上传到 GitHub。
 - `notes/`: 本地工作记录。这个目录不上传到 GitHub。
@@ -68,3 +70,20 @@ git push
 ```bash
 python3 .codex/skills/chexie-signature/scripts/make_preview.py input.html output.html
 ```
+
+只读解析一个 legacy CAPUBBS 帖子页面为结构化 JSON：
+
+```bash
+python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
+```
+
+这个命令只做一次公开 GET 请求，不使用登录信息，也不会写论坛。
+
+只读搜索 legacy CAPUBBS 公开帖子并输出结构化 JSON：
+
+```bash
+python3 scripts/chexie_search_threads.py "新版论坛"
+python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
+```
+
+这个命令只提交一次公开搜索表单，不使用登录信息，也不会写论坛。

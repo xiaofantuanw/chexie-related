@@ -49,7 +49,8 @@ Use this workflow when a new AI agent enters this project:
 6. For `draft`, save drafts/previews under ignored local directories such as `data/` unless the user asks for a tracked artifact.
 7. For `write`, require exact user authorization for the target and payload. Confirm the logged-in account before writing.
 8. After changes, run the narrowest useful verification. For Python scaffolding, `python3 -m pytest` or `python3 -m compileall` is usually enough.
-9. Before committing, run the commands in the Development section and verify that `data`, `notes`, and `login_info` are not tracked.
+9. Before finishing, check whether docs need updates, including `README.md`, `AGENTS.md`, skill docs, and related files under `docs/`.
+10. Before committing, run the commands in the Development section and verify that `data`, `notes`, and `login_info` are not tracked.
 
 ## Forum Versions
 
@@ -88,6 +89,16 @@ Use this organization for future account-agent work:
 - `docs/`: public, sanitized design and migration notes.
 
 Do not move working legacy scripts into the package until the equivalent adapter method has tests or a clear manual verification path.
+
+Current read-only thread parser entry point:
+
+```bash
+python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
+python3 scripts/chexie_search_threads.py "新版论坛"
+python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
+```
+
+These commands perform public read-only HTTP requests and print structured JSON. They must not use login credentials or write forum state.
 
 ## Account-Agent Roadmap
 
