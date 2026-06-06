@@ -31,7 +31,8 @@ Use `scripts/make_preview.py` to wrap a snippet into a local preview page.
 Some inspection steps may require a logged-in chexie.net session. If credentials or cookies are stored locally in the project, treat them as secrets:
 
 - Never copy usernames, passwords, cookies, tokens, or session ids into this skill, generated drafts, preview files, examples, logs, or user-facing responses.
-- Do not hard-code credentials in scripts. Use the project's existing credential-loading helper or ask the user for authorization when login is necessary.
+- Do not ask the user to paste a password into chat. When a password is needed, write or adapt a local script and have the user run it so the password is entered in the terminal via hidden interactive input such as Python `getpass.getpass()`.
+- Do not hard-code credentials in scripts. Use the project's existing credential-loading helper, or use an interactive local password prompt after the user authorizes login.
 - Prefer read-only inspection first. Do not perform live signature edits, posts, replies, uploads, or account-setting changes unless the user explicitly authorizes that exact action.
 - When summarizing findings, describe the account or signature by the user-provided target name only; omit the credential source and all secret values.
 - If target-account signature inspection becomes blocked by login/session mismatch, CAPUBBS permissions, or unreliable post archaeology, stop trying to guess. Use or adapt `scripts/export_own_chexie_signatures.py` so the user can log in as the target account and export only the needed `sig1/sig2/sig3` HTML/types to local files. The helper must not print or save passwords, cookies, tokens, or session ids.
@@ -42,7 +43,7 @@ Use this only after explicit authorization for the target account and target slo
 
 1. Generate and preview the signature snippet locally.
 2. Compact final HTML before posting, especially if it contains tags or scripts; source newlines may render as visible `<br>`.
-3. Login with interactive password entry or an approved local secret loader. Do not print or persist secrets.
+3. Login with a local script using interactive password entry, such as `getpass.getpass()`, or an approved local secret loader. Do not ask for passwords in chat, and do not print or persist secrets.
 4. Fetch `/bbs/edituser/` after login and confirm it belongs to the target account before any write.
 5. Preserve all profile fields. When parsing `<textarea>` values, use raw inner HTML such as `decode_contents()`, not visible text, so `<script>...</script>` loaders are not stripped.
 6. Post the full signature HTML to the configured signature repository thread as a normal reply.

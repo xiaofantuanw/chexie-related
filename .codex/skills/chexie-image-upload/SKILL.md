@@ -21,6 +21,7 @@ Help with images on chexie.net CAPUBBS posts and signatures. Keep these cases se
 2. Prefer external links or an existing stable Chexie image URL for signatures unless the user specifically asks to upload a new image to the forum.
 3. Do not perform live uploads, posts, edits, or deletes unless the user explicitly authorizes that exact operation.
 4. Treat credentials, cookies, tokens, and session ids as secrets. Never print or store them in generated output.
+5. Do not ask the user to paste a password into chat. When login is needed, write or adapt a local script and have the user run it so the password is entered in the terminal via hidden interactive input such as Python `getpass.getpass()`.
 
 ## What The Forum Tutorial Says
 
@@ -88,7 +89,7 @@ Use this when the user asks to upload an image so it becomes a reusable forum-ho
 The reply editor loads `/bbs/lib/nic.js`. The verified `上传图片` button flow is:
 
 1. Require explicit authorization before doing this live write operation.
-2. Login with an authorized account. Do not print or persist usernames, passwords, cookies, session ids, or tokens.
+2. Login with an authorized account using a local script with interactive password entry, such as `getpass.getpass()`, or an approved local secret loader. Do not ask for passwords in chat, and do not print or persist usernames, passwords, cookies, session ids, or tokens.
 3. Keep the image under the editor's apparent 1 MB limit. The editor UI says `上传图片（最大允许1M）`.
 4. Send `multipart/form-data` by `POST` to:
 
