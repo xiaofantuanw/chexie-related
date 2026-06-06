@@ -87,3 +87,13 @@ python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
 ```
 
 这个命令只提交一次公开搜索表单，不使用登录信息，也不会写论坛。
+
+统一的只读 research 入口：
+
+```bash
+python3 scripts/chexie_research.py read "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
+python3 scripts/chexie_research.py read "2-9015" --all-pages --format markdown
+python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
+```
+
+`chexie_research.py` 默认输出 Markdown，包含稳定的 thread/floor 引用，适合让后续 agent 做总结、对比和证据链整理；也可以用 `--format json` 输出结构化数据。

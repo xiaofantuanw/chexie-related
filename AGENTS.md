@@ -93,12 +93,15 @@ Do not move working legacy scripts into the package until the equivalent adapter
 Current read-only thread parser entry point:
 
 ```bash
+python3 scripts/chexie_research.py read "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
+python3 scripts/chexie_research.py read "2-9015" --all-pages --format markdown
+python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
 python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
 python3 scripts/chexie_search_threads.py "新版论坛"
 python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
 ```
 
-These commands perform public read-only HTTP requests and print structured JSON. They must not use login credentials or write forum state.
+Prefer `chexie_research.py` for new read-only workflows because it can merge all pages and render stable Markdown citations. `chexie_read_thread.py` and `chexie_search_threads.py` remain lower-level JSON helpers. These commands perform public read-only HTTP requests. They must not use login credentials or write forum state.
 
 ## Account-Agent Roadmap
 

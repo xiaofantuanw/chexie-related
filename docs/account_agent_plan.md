@@ -26,12 +26,17 @@ Stage 0: foundation
 Initial read-only thread parsing is implemented through:
 
 ```bash
+python3 scripts/chexie_research.py read "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
+python3 scripts/chexie_research.py read "2-9015" --all-pages --format markdown
+python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
 python3 scripts/chexie_read_thread.py "https://chexie.net/bbs/content/?bid=28&tid=150&p=1"
 python3 scripts/chexie_search_threads.py "新版论坛"
 python3 scripts/chexie_search_threads.py "暑期" --author "蓝" --type post
 ```
 
-These should remain public read-only workflows. They are the first standardized read paths for later summarization, signup parsing, reminders, and account actions.
+`chexie_research.py` is the preferred first-stage read-only agent entry point. It wraps the adapter in `ForumResearchAgent`, supports all-page thread reads, and renders Markdown with stable thread/floor references for later summarization, signup parsing, reminders, and account actions. The lower-level scripts remain useful for JSON-only inspection.
+
+These should remain public read-only workflows unless an explicitly authorized authenticated read mode is added later.
 
 Stage 1: account control
 

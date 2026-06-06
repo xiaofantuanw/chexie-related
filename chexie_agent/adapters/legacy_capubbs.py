@@ -48,6 +48,37 @@ class LegacyCapubbsAdapter:
         resp.raise_for_status()
         return self.parse_thread_html(resp.text, thread=thread, page=page, source_url=resp.url)
 
+    def fetch_thread_pages(
+        self,
+        thread: ThreadRef,
+        *,
+        start_page: int = 1,
+        max_pages: int | None = None,
+    ) -> ForumThread:
+        first_page = max(1, start_page)
+        first = self.fetch_thread(thread, first_page)
+        total_pages = first.total_pages or first_page
+        last_page = total_pages if max_pages is None else min(total_pages, first_page + max_pages - 1)
+
+        pages = [first]
+        for page in range(first_page + 1, last_page + 1):
+            pages.append(self.fetch_thread(thread, page))
+
+        posts: list[ForumPost] = []
+        for thread_page in pages:
+            posts.extend(thread_page.posts)
+
+        return ForumThread(
+            ref=first.ref,
+            title=first.title,
+            board=first.board,
+            page=first_page,
+            total_pages=first.total_pages,
+            posts=tuple(posts),
+            source_url=first.source_url,
+            login_required=any(thread_page.login_required for thread_page in pages),
+        )
+
     def search_threads(
         self,
         keyword: str,
@@ -233,7 +264,8 @@ def _parse_posted_at(row: Tag) -> str:
 
 def _parse_nested_replies(row: Tag) -> list[NestedReply]:
     replies: list[NestedReply] = []
-    for item in row.select(".lzltable .lzltd"):
+    local_row = _clone_without_nested_floor_rows(row)
+    for item in local_row.select(".lzltable .lzltd"):
         author_node = item.select_one("a.author")
         time_node = item.select_one(".lzltime")
         author = author_node.get_text(" ", strip=True) if author_node else ""
@@ -243,9 +275,22 @@ def _parse_nested_replies(row: Tag) -> list[NestedReply]:
         for tag in clone.select("a.author, .lzltime, .lzlicon"):
             tag.decompose()
         content_text = clone.get_text(" ", strip=True).lstrip(":：").strip()
-        if author or content_text:
-            replies.append(NestedReply(author=author, content_text=content_text, posted_at=posted_at))
+        if not author:
+            continue
+        if not content_text or content_text in {"发表", "我也说一句 发表"}:
+            continue
+        replies.append(NestedReply(author=author, content_text=content_text, posted_at=posted_at))
     return replies
+
+
+def _clone_without_nested_floor_rows(row: Tag) -> Tag:
+    clone = BeautifulSoup(str(row), "html.parser")
+    root = clone.select_one("tr.floor")
+    if root is None:
+        return clone
+    for nested_floor in root.find_all("tr", class_="floor"):
+        nested_floor.decompose()
+    return root
 
 
 def _parse_search_results(soup: BeautifulSoup, source_url: str) -> list[ForumSearchResult]:
@@ -261,9 +306,10 @@ def _parse_search_results(soup: BeautifulSoup, source_url: str) -> list[ForumSea
         if ref is None or ref in seen:
             continue
         seen.add(ref)
-        title = link.get_text(" ", strip=True)
+        raw_title = link.get_text(" ", strip=True)
         container = _nearest_result_container(link)
-        excerpt = _extract_excerpt(container, title)
+        excerpt = _extract_excerpt(container, raw_title)
+        title = _derive_search_title(container, raw_title)
         results.append(
             ForumSearchResult(
                 ref=ref,
@@ -311,3 +357,15 @@ def _extract_excerpt(container: Tag | None, title: str) -> str:
     if title and text.startswith(title):
         text = text[len(title) :].strip(" -:：")
     return text
+
+
+def _derive_search_title(container: Tag | None, raw_title: str) -> str:
+    if raw_title and raw_title != "查看原帖":
+        return raw_title
+    if container is None:
+        return raw_title
+    text = container.get_text(" ", strip=True)
+    match = re.search(r"(?:Re:\s*)?(.+?)\s+查看原帖\s+---\s+", text)
+    if match:
+        return match.group(1).strip()
+    return raw_title

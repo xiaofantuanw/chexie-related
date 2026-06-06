@@ -34,12 +34,24 @@ class ThreadRef:
     def new_thread_id(self) -> str:
         return f"{self.bid}-{self.tid}"
 
+    @property
+    def short_label(self) -> str:
+        return f"{self.bid}-{self.tid}"
+
 
 @dataclass(frozen=True)
 class FloorRef:
     thread: ThreadRef
     floor: int | None = None
     pid: int | None = None
+
+    @property
+    def label(self) -> str:
+        if self.floor is not None:
+            return f"{self.thread.short_label}#{self.floor}F"
+        if self.pid is not None:
+            return f"{self.thread.short_label}@pid{self.pid}"
+        return self.thread.short_label
 
 
 @dataclass(frozen=True)
@@ -57,6 +69,10 @@ class ForumPost:
     content_html: str = ""
     pid: int | None = None
     nested_replies: tuple["NestedReply", ...] = ()
+
+    @property
+    def ref(self) -> FloorRef:
+        return FloorRef(thread=self.thread, floor=self.floor, pid=self.pid)
 
 
 @dataclass(frozen=True)
