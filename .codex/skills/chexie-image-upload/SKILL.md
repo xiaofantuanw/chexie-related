@@ -23,6 +23,16 @@ Help with images on chexie.net CAPUBBS posts and signatures. Keep these cases se
 4. Treat credentials, cookies, tokens, and session ids as secrets. Never print or store them in generated output.
 5. Do not ask the user to paste a password into chat. When login is needed, write or adapt a local script and have the user run it so the password is entered in the terminal via hidden interactive input such as Python `getpass.getpass()`.
 
+## Default Test Thread
+
+When the user asks to test image upload and does not specify a destination thread, use this water-board test thread after explicit authorization:
+
+```text
+https://chexie.net/bbs/content/?p=3&bid=4&tid=20131
+```
+
+This default is only for image upload tests. Do not use it for signature source floors unless the user explicitly asks.
+
 ## What The Forum Tutorial Says
 
 The public tutorial thread `bid=4&tid=19500` distinguishes two ways to insert images in posts:

@@ -26,6 +26,16 @@ Create maintainable chexie.net BBS signature HTML and a local preview page. Supp
 
 Use `scripts/make_preview.py` to wrap a snippet into a local preview page.
 
+## Default Signature Test Thread
+
+For signature source floors, signature loader tests, and signature-related examples, use this thread by default after explicit authorization:
+
+```text
+https://chexie.net/bbs/content/?bid=4&tid=19989&p=1
+```
+
+This is the signature tutorial/repository thread. Do not use the image-upload test thread for signature source floors unless the user explicitly asks.
+
 ## Login And Credential Safety
 
 Some inspection steps may require a logged-in chexie.net session. If credentials or cookies are stored locally in the project, treat them as secrets:
