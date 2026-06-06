@@ -59,7 +59,7 @@ Use this only after explicit authorization for the target account and target slo
 6. Post the full signature HTML to the configured signature repository thread as a normal reply.
 7. When posting that source floor, set the reply `sig` parameter to the same slot number the user wants to replace, not `0`, unless the user explicitly asks to post without a signature.
 8. Find the new source floor `pid`, build the loader, and update only the requested `sigN` field plus `sigN_type=html`.
-9. Verify by refetching `/bbs/edituser/` and the source floor API. Save before/after snapshots under `data/inspect_chexie/`.
+9. Verify by refetching `/bbs/edituser/` and the source floor API. For loader text, check the raw refetched edit page HTML; parser output may normalize tags like `<br>` to `<br/>` and cause false failures. Save before/after snapshots under `data/inspect_chexie/`.
 10. For later visual edits, edit the source floor content instead of reposting or changing the loader.
 
 For implementation details and reusable script structure, read `references/live-update.md`.

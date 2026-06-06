@@ -38,7 +38,7 @@ Require explicit values before any write:
    - `sigN` to the loader;
    - `sigN_type` to `html`.
 6. Submit `/bbs/edituser/action.php`.
-7. Refetch `/bbs/edituser/` and verify the exact loader is present in `sigN`.
+7. Refetch `/bbs/edituser/` and verify against the raw response HTML when checking loader text. HTML parsers may normalize textarea content, for example changing `<br>` to `<br/>`, which can cause false verification failures.
 
 ### Edit Source Floor
 
@@ -55,6 +55,7 @@ Use this when the loader is already installed and the user only wants visual/con
 
 - Use `BeautifulSoup(..., "html.parser")` for structure, but do not use `.text` for signature textareas.
 - For every `<textarea>`, read `field.decode_contents()` so embedded `<script>` tags survive.
+- Do not compare parser-normalized textarea HTML to the original loader with strict string equality. Prefer checking that the raw refetched edit page contains the loader, then use parsed form data only to confirm the selected slot type such as `sigN_type=html`.
 - Preserve hidden fields, selected radio values, selected options, and JS-initialized profile fields such as icon and sex.
 - If the target account cannot be confirmed, stop before writing.
 - If the form field for source-floor body cannot be identified unambiguously, stop and save a snapshot.
@@ -79,6 +80,6 @@ Save snapshots under `data/inspect_chexie/`:
 A successful update should show:
 
 - source floor API contains the full compact signature HTML;
-- selected profile slot contains the full loader, including `<script>`;
+- raw refetched edit profile HTML contains the full loader, including `<script>`;
 - selected profile slot type is `html`;
 - unrelated profile fields remain unchanged.
