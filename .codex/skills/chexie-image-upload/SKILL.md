@@ -11,6 +11,7 @@ Help with images on chexie.net CAPUBBS posts and signatures. Keep these cases se
 
 - **External image link**: the image stays on another site and Chexie only displays it.
 - **Forum-hosted post image**: the image is stored on Chexie and rendered from paths like `../images/<hash>.jpg`.
+- **Editor image upload**: the reply editor's `上传图片` button stores an image on Chexie and returns a reusable image URL.
 - **Post attachment**: a file is uploaded via the reply editor's `添加附件` flow and bound to a post by attachment id.
 - **Signature image**: a signature references an image URL or uses a source floor that contains image HTML.
 
@@ -63,6 +64,8 @@ https://chexie.net/bbs/images/88b87c284731c1bccc8f20f85691af16997ae7bd.png
 
 ## Forum Attachment Upload Flow
 
+Use this only for generic files or attachment-style downloads. This is not the same as the editor's `上传图片` button.
+
 The reply page uses the shared script `/bbs/lib/content_shared.js`. The verified attachment flow is:
 
 1. User clicks `添加附件`, which triggers a hidden file input.
@@ -77,6 +80,53 @@ The reply page uses the shared script `/bbs/lib/content_shared.js`. The verified
 7. Unused attachments can be permanently deleted via `POST ../delattach/` with `id`.
 
 Use this flow for files that should be attached to a post. Do not assume it creates an embeddable image URL for signatures.
+
+## Editor Image Upload Flow
+
+Use this when the user asks to upload an image so it becomes a reusable forum-hosted image URL.
+
+The reply editor loads `/bbs/lib/nic.js`. The verified `上传图片` button flow is:
+
+1. Require explicit authorization before doing this live write operation.
+2. Login with an authorized account. Do not print or persist usernames, passwords, cookies, session ids, or tokens.
+3. Keep the image under the editor's apparent 1 MB limit. The editor UI says `上传图片（最大允许1M）`.
+4. Send `multipart/form-data` by `POST` to:
+
+```text
+https://chexie.net/bbs/content/test.php
+```
+
+5. Include fields:
+   - `image`: the image file.
+   - `key`: `b7ea18a4ecbda8e92203fa4968d10660`.
+6. Parse the JSON response and read:
+
+```text
+upload.links.original
+```
+
+7. If the returned URL is relative, usually `../images/<hash>.<ext>`, normalize it to:
+
+```text
+https://chexie.net/bbs/images/<hash>.<ext>
+```
+
+8. Verify the normalized URL with a GET request before using it in a post or signature.
+9. To publish it in a post, insert HTML such as:
+
+```html
+<img src="https://chexie.net/bbs/images/<hash>.<ext>" style="max-width:95%;">
+```
+
+10. To post a reply programmatically, send `POST /bbs/post/` with `bid`, `tid`, login `token`, `title`, `text`, `sig`, and `attachs`. Set `attachs` to an empty string for an uploaded inline image.
+
+Live validation performed on 2026-06-06:
+
+- Generated a 320x180 white PNG, 453 bytes.
+- Uploaded it via `/bbs/content/test.php`.
+- Received a forum-hosted URL under `/bbs/images/`.
+- Inserted it into a reply in the requested test thread.
+- Verified the image URL returned HTTP 200 with `content-type: image/png`.
 
 ## Forum-Hosted Image URLs
 
@@ -99,9 +149,10 @@ If the only available result from upload is an attachment id, post or inspect th
 When guiding a non-technical user:
 
 1. For external images: open the reply editor, use the toolbar's image button or write `[img]IMAGE_URL[/img]`.
-2. For upload/preservation: use the editor's image upload or attachment control if visible, choose the file, keep `auth=0` and `price=0` unless there is a reason to restrict access, then submit the post.
-3. After the post renders, right-click or inspect the displayed image and copy the final `https://chexie.net/bbs/images/...` URL if it will be reused in a signature.
-4. For signatures, place the copied image URL in the signature HTML or the dynamic source floor.
+2. For image upload/preservation: use the editor's `上传图片` button if visible, choose an image under 1 MB, then submit the post.
+3. For generic file attachment: use `添加附件`, choose the file, keep `auth=0` and `price=0` unless there is a reason to restrict access, then submit the post.
+4. After the post renders, right-click or inspect the displayed image and copy the final `https://chexie.net/bbs/images/...` URL if it will be reused in a signature.
+5. For signatures, place the copied image URL in the signature HTML or the dynamic source floor.
 
 ## Implementation Notes
 
@@ -109,6 +160,7 @@ When guiding a non-technical user:
 - Source references that established this workflow:
   - Public tutorial: `https://www.chexie.net/bbs/content/?bid=4&tid=19500&p=1`
   - Image size follow-up: `https://chexie.net/bbs/content/?bid=4&tid=19603&p=1`
+  - Editor image upload JavaScript: `https://chexie.net/bbs/lib/nic.js`
   - Shared upload JavaScript: `https://chexie.net/bbs/lib/content_shared.js`
 - If live automation is needed, preserve the browser's cookies and CSRF/token behavior. Do not hard-code credentials or tokens.
 - Before using a forum-hosted image in a signature, verify the URL loads without requiring the target account's login.

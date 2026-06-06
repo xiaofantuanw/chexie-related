@@ -30,6 +30,7 @@
 
 - 外链图片：论坛只展示外部 URL，不占用论坛存储。
 - 论坛托管图片：图片保存在 `https://chexie.net/bbs/images/...` 之类的地址。
+- 编辑器图片上传：通过回复编辑器的 `上传图片` 按钮上传到 `/bbs/content/test.php`，返回可复用的论坛托管图片 URL。
 - 帖子附件：通过发帖编辑器的 `添加附件` 上传，并用 attachment id 绑定到帖子。
 - 签名档图片：在签名档 HTML 或动态 source floor 里引用图片 URL。
 
@@ -67,4 +68,3 @@ git push
 ```bash
 python3 .codex/skills/chexie-signature/scripts/make_preview.py input.html output.html
 ```
-
