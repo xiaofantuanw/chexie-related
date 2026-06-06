@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Restore sig1 to the saved loader for the 2021实践团 chexie account."""
+"""Set 小饭团w sig2 to the saved 2021实践团 sig1 source-floor loader."""
 
 from __future__ import annotations
 
@@ -15,10 +15,27 @@ from bs4 import BeautifulSoup
 
 
 BASE = "https://chexie.net/bbs"
-TARGET_ACCOUNT = "2021实践团"
+TARGET_ACCOUNT = "小饭团w"
+SOURCE_ACCOUNT = "2021实践团"
 ROOT = Path(__file__).resolve().parent.parent
 STATE_PATH = ROOT / "data" / "2021_practice_signature_live_state.json"
+LOGIN_INFO = ROOT / "login_info" / "login.md"
 SNAPSHOT_DIR = ROOT / "data" / "inspect_chexie"
+
+
+def read_login_value(text: str, label: str) -> str | None:
+    match = re.search(rf"\*\*{re.escape(label)}\*\*：([^\n]+)", text)
+    return match.group(1).strip() if match else None
+
+
+def read_local_password(username: str) -> str | None:
+    if not LOGIN_INFO.exists():
+        return None
+    text = LOGIN_INFO.read_text(encoding="utf-8")
+    stored_username = read_login_value(text, "用户名（ID）")
+    if stored_username != username:
+        return None
+    return read_login_value(text, "密码")
 
 
 def make_session() -> requests.Session:
@@ -36,21 +53,24 @@ def make_session() -> requests.Session:
     return sess
 
 
-def login(sess: requests.Session) -> None:
-    password = getpass.getpass(f"Password for {TARGET_ACCOUNT}: ")
+def login(sess: requests.Session, username: str) -> None:
+    password = read_local_password(username)
+    if password is None:
+        password = getpass.getpass(f"Password for {username}: ")
     password1 = hashlib.md5(password.encode("utf-8")).hexdigest()
     password = ""
     resp = sess.post(
         f"{BASE}/login/action.php",
-        data={"username": TARGET_ACCOUNT, "password1": password1},
+        data={"username": username, "password1": password1},
         timeout=20,
     )
     resp.raise_for_status()
 
     check = sess.get(f"{BASE}/edituser/", timeout=20)
     check.raise_for_status()
-    if TARGET_ACCOUNT not in check.text:
-        raise RuntimeError(f"Logged-in account is not {TARGET_ACCOUNT}; aborting.")
+    soup = BeautifulSoup(check.text, "html.parser")
+    if username not in soup.get_text(" ", strip=True):
+        raise RuntimeError(f"Logged-in account is not {username}; aborting.")
 
 
 def extract_edit_form(html: str) -> dict[str, str]:
@@ -96,25 +116,39 @@ def extract_edit_form(html: str) -> dict[str, str]:
     return data
 
 
+def load_2021_sig1_loader() -> str:
+    state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
+    loader = state.get("loader", "")
+    if state.get("account") != SOURCE_ACCOUNT:
+        raise RuntimeError("State file is not for 2021实践团.")
+    if not isinstance(loader, str) or "<script>" not in loader:
+        raise RuntimeError("State file does not contain a valid HTML loader.")
+    bid = state.get("bid")
+    tid = state.get("tid")
+    pid = state.get("pid")
+    expected = f"bid={bid}&tid={tid}&pid={pid}"
+    if expected not in loader:
+        raise RuntimeError("State loader does not match state source floor.")
+    return loader
+
+
 def main() -> int:
     try:
-        state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
-        loader = state["loader"]
-        if state.get("account") != TARGET_ACCOUNT or "<script>" not in loader:
-            raise RuntimeError("State file does not contain a valid loader for the target account.")
+        loader = load_2021_sig1_loader()
 
         sess = make_session()
-        login(sess)
+        login(sess, TARGET_ACCOUNT)
 
         before = sess.get(f"{BASE}/edituser/", timeout=20)
         before.raise_for_status()
         SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
-        before_path = SNAPSHOT_DIR / "restore_2021_sig1_before.html"
+        before_path = SNAPSHOT_DIR / "link_xiaofantuanw_sig2_before.html"
         before_path.write_text(before.text, encoding="utf-8")
 
         data = extract_edit_form(before.text)
-        data["sig1"] = loader
-        data["sig1_type"] = "html"
+        old_sig2_len = len(data["sig2"])
+        data["sig2"] = loader
+        data["sig2_type"] = "html"
 
         resp = sess.post(f"{BASE}/edituser/action.php", data=data, timeout=30)
         resp.raise_for_status()
@@ -122,13 +156,14 @@ def main() -> int:
 
         after = sess.get(f"{BASE}/edituser/", timeout=20)
         after.raise_for_status()
-        after_path = SNAPSHOT_DIR / "restore_2021_sig1_after.html"
+        after_path = SNAPSHOT_DIR / "link_xiaofantuanw_sig2_after.html"
         after_path.write_text(after.text, encoding="utf-8")
         after_data = extract_edit_form(after.text)
-        if loader not in after.text or after_data["sig1_type"] != "html":
-            raise RuntimeError("Restore verification failed; inspect saved snapshots.")
+        if loader not in after.text or after_data["sig2_type"] != "html":
+            raise RuntimeError("Verification failed; inspect saved snapshots.")
 
-        print(f"restored sig1 loader for {TARGET_ACCOUNT}")
+        print(f"linked {TARGET_ACCOUNT} sig2 to {SOURCE_ACCOUNT} sig1 source floor")
+        print(f"old sig2 length={old_sig2_len}, new sig2 length={len(loader)}")
         print(f"saved snapshots: {before_path}, {after_path}")
         return 0
     except Exception as exc:
