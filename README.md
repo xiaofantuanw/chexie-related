@@ -97,3 +97,12 @@ python3 scripts/chexie_research.py search "暑期" --author "蓝" --type post
 ```
 
 `chexie_research.py` 默认输出面向用户的 Markdown，只使用标题、版面、楼层、作者和时间来称呼帖子内容，不把 `bid/tid/pid` 暴露为日常称呼；也可以用 `--format json` 输出包含内部引用的结构化数据。
+
+本地起草回帖，但不登录、不发帖：
+
+```bash
+python3 scripts/chexie_account_draft.py reply "https://chexie.net/bbs/content/?bid=28&tid=150&p=1" --text "这里写回帖正文"
+python3 scripts/chexie_account_draft.py reply "PASTE_THREAD_URL_HERE" --text-file draft.txt --print-preview
+```
+
+生成的 JSON 和 Markdown 预览默认保存在 `data/drafts/`。这些文件是本地草稿，方便检查目标帖子和 exact payload；后续真正发帖仍需要对目标和正文做明确授权。
